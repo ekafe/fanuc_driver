@@ -34,7 +34,9 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "string": "cpp",
+        "log.c": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }

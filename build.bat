@@ -11,5 +11,6 @@ if not exist %VS2019TOOLS% (
 call %VS2019TOOLS%
 
 :: run the compiler with your arguments
-cl.exe /EHsc /Zi /Fe: fanuc_driver.exe main.cpp /link .\assets\Fwlib32.lib D:\code_library\mysql_lib\bit32\lib\vs14\mysqlcppconn.lib
+@REM cl.exe /EHsc /Zi /Fe: fanuc_driver.exe main.cpp /link .\assets\Fwlib32.lib D:\code_library\mysql_lib\bit32\lib\vs14\mysqlcppconn.lib - C++
+cl.exe /ID:lib /EHsc /Zi /Fe: fanuc_driver.exe main.cpp easylogging++.cc /link .\assets\Fwlib32.lib D:\code_library\mysql_lib\lib\opt\libmysql.lib
 exit

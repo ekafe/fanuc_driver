@@ -89,7 +89,9 @@ void readMachineTimer(float* returnArray) {
         part_count = (float)struct_param[7].data[0].prm_val;
     }
     else {
-        printf("Error : %hd", result);
+        connected = false;
+        LOG(ERROR) << "Failed to Read parameters : "<<result;
+        // printf("Error : %hd", result);
     }
 
     //printf("Power On Time : %f\n", power_on_time);
@@ -137,12 +139,15 @@ void resetTimerForDay() {
     // Executing the Function
     result = cnc_wrparas(libh, 8 * 6, param);
     if (result != EW_OK) {
-        fprintf(stderr, "Failed to Write parameters!\n");
+        LOG(ERROR) << "Failed to Write parameters : ";
+        fprintf(stderr, "\n");
         result = 1;
+        connected = false;
         // closeConnection();
     }
     else {
-        printf("Value Updated\n");
+        LOG(INFO) << "Reset Paramter Updated ";
+        // printf("Value Updated\n");
     }
 
     // Freeing the Memory Allocation
@@ -173,13 +178,41 @@ void readMacroVariables(int * returnArray) {
             /*printf("Datas : %d\n", value);*/
             returnArray[idx] = value;
         }
-    else
-        printf("ERROR!(%d)\n", ret);
+    else{
+        LOG(ERROR) << "Failed to Read Macro parameters : "<<ret;
+        // printf("ERROR!(%d)\n", ret);
+        connected = false;
+    }
     free(macror);
     /*return (ret);*/
 }
 
+// Whole Process
+void collectParameters(){
 
+    // Check Database Whether Reset Timer is Recquired Or Not
+    bool reset_status = isResetRecquired();
+    if(reset_status){
+        // Reset All The Timer
+        LOG(INFO) << "Resetting the Data in Timer";
+        // printf("Resetting the Data in Timer\n");
+        resetTimerForDay();
+    }
 
+    // Collect the Data Continously
+    float machine_parameter[4];
+    int macro_parameters[3] = {-1,-1,-1};
+    readMachineTimer(machine_parameter);
+    readMacroVariables(macro_parameters);
+
+    struct DbParameter db;
+    assignParameter(&db, machine_parameter, macro_parameters);
+    // printParameters(&db);
+    if(!repetition && connected) {
+        updateToDatabase(&db);
+    }else{
+        // cout<<"Repeated Value : Not Updating To Database"<<endl;
+    }
+}
 
 

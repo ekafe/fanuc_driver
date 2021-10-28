@@ -76,6 +76,25 @@ static void test_stmt_error(MYSQL_STMT* stmt, int status)
     }
 }
 
+void checkRepition(float* data1, int* data2){
+
+    // Storing the Data as String (Only Taking Operating Time and Power On Time)
+    if(first_time){
+        previous_data = floatToString(data1[1])+floatToString(data1[3]);
+        LOG(INFO)<<previous_data;
+        // cout<<previous_data<<endl;
+        first_time = false;
+    }else{
+        current_data = floatToString(data1[1])+floatToString(data1[3]);
+        if(current_data == previous_data){
+            repetition = true;
+        }else{
+            previous_data = current_data;
+            repetition = false;
+        }
+    }
+}
+
 /*
    Send the Query to Database to Check Whether Reset in Required Or Nor
 */
@@ -87,7 +106,7 @@ bool isResetRecquired(){
     int data_result = -1;
 
     int status = { 0 };
-    status = mysql_query(conn, "CALL check_db(1,0)");
+    status = mysql_query(conn, "CALL check_db(2,0)");
     test_error(conn, status);
 
     /* did current statement return data? */
@@ -99,7 +118,7 @@ bool isResetRecquired(){
         while ((row = mysql_fetch_row(res)) != NULL) {
             //printf("Data : %s", row[0]);
             data_result = atoi(row[0]);
-            //printf("Data Converted : %d", data_result);
+            // printf("Data Converted : %d\n", data_result);
         }
     }
 
@@ -123,6 +142,8 @@ void assignParameter(struct DbParameter *db, float *data1, int* data2) {
     db->r1 = data2[0];
     db->r2 = data2[1];
     db->r3 = data2[2];
+
+    checkRepition(data1,data2);
 
 }
 
@@ -171,9 +192,17 @@ void updateToDatabase(struct DbParameter* db) {
     status = mysql_query(conn, url);
     test_error(conn, status);
 
-    if (!status) printf("Data Updated Successfully\n"); else printf("Data Updation Failed");
+    if (!status) {
+        LOG(INFO)<<"Data Updated Successfully";
+        // printf("Data Updated Successfully\n");
+    } 
+    else {
+        LOG(WARNING) << "Data Updation Failed";
+        // printf("Data Updation Failed");
+    }
 
     /* close connection */
     mysql_close(conn);
 
 }
+

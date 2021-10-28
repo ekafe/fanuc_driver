@@ -11,21 +11,34 @@ int connection_result = 0;
 bool connectToMachine(){
 
     // Connect to Fanuc Macine
-    cout<<"Connecting To Machine:\t";
+    // cout<<"Connecting To Machine:\t";
+    LOG(INFO) <<"Connecting To Machine";
     connection_result = cnc_allclibhndl3(MACHINE_HOST,MACHINE_PORT,10, &libh);
 
     if(connection_result == EW_OK){
-        cout<<"Machine Connected"<<endl;
+        LOG(INFO) <<"Machine Connected";
+        // cout<<"Machine Connected"<<endl;
+        return true;
     }else{
         // fprintf(stderr, "Failed to connect to cnc! (%d)\n", connection_result);
         if(connection_result == -16){
-            cout<<"Connection Failed - Not Connected To Network/ OFF"<<endl;
+            LOG(WARNING) <<"Connection Failed - Not Connected To Network/ OFF";
+            // cout<<"Connection Failed - Not Connected To Network/ OFF"<<endl;
         }
         #ifndef _WIN32
             cnc_exitprocess();
         #endif
-            printf("Connection Closed - \t");
+            LOG(INFO) <<"Connection Closed";
+            // printf("Connection Closed - \t");
         return false;
     }
 
+}
+
+string floatToString(float x){
+    string s;
+    stringstream ss;
+    ss << std::fixed << std::setprecision(2) << x;
+    s = ss.str();
+    return s;
 }
